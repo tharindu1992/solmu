@@ -1,0 +1,56 @@
+
+// Pragma actually parses anything up to the trailing ';' to be fully forward-compatible.
+
+
+Parameter = TypeName StorageLocation? Identifier?
+
+EventParameterList = '(' ( EventParameter (',' EventParameter )* )? ')'
+EventParameter = TypeName 'indexed'? Identifier?
+
+FunctionTypeParameterList = '(' ( FunctionTypeParameter (',' FunctionTypeParameter )* )? ')'
+FunctionTypeParameter = TypeName StorageLocation?
+
+
+FunctionTypeName = 'function' FunctionTypeParameterList ( 'internal' | 'external' | StateMutability )*
+                   ( 'returns' FunctionTypeParameterList )?
+
+
+
+SimpleStatement = VariableDefinition | ExpressionStatement
+
+VariableDefinition = (VariableDeclaration | '(' VariableDeclaration? (',' VariableDeclaration? )* ')' ) ( '=' Expression )?
+
+ExpressionList = Expression ( ',' Expression )*
+NameValueList = Identifier ':' Expression ( ',' Identifier ':' Expression )*
+
+
+FunctionCallArguments = '{' NameValueList? '}'
+                      | ExpressionList?
+
+
+AssemblyBlock = '{' AssemblyStatement* '}'
+
+AssemblyStatement = AssemblyBlock
+                  | AssemblyFunctionDefinition
+                  | AssemblyVariableDeclaration
+                  | AssemblyAssignment
+                  | AssemblyIf
+                  | AssemblyExpression
+                  | AssemblySwitch
+                  | AssemblyForLoop
+                  | AssemblyBreakContinue
+AssemblyFunctionDefinition =
+    'function' Identifier '(' AssemblyIdentifierList? ')'
+    ( '->' AssemblyIdentifierList )? AssemblyBlock
+AssemblyVariableDeclaration = 'let' AssemblyIdentifierList ( ':=' AssemblyExpression )?
+AssemblyAssignment = AssemblyIdentifierList ':=' AssemblyExpression
+AssemblyExpression = AssemblyFunctionCall | Identifier | Literal
+AssemblyIf = 'if' AssemblyExpression AssemblyBlock
+AssemblySwitch = 'switch' AssemblyExpression ( Case+ AssemblyDefault? | AssemblyDefault )
+AssemblyCase = 'case' Literal AssemblyBlock
+AssemblyDefault = 'default' AssemblyBlock
+AssemblyForLoop = 'for' AssemblyBlock AssemblyExpression AssemblyBlock AssemblyBlock
+AssemblyBreakContinue = 'break' | 'continue'
+AssemblyFunctionCall = Identifier '(' ( AssemblyExpression ( ',' AssemblyExpression )* )? ')'
+
+AssemblyIdentifierList = Identifier ( ',' Identifier )*
